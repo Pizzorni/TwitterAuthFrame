@@ -1,25 +1,32 @@
 import java.awt.Container;
-
-import javax.swing.BoxLayout;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
-
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
+
 import twitter4j.TwitterException;
 
-
+/**
+ * JFrame for the Tweet class
+ * @author marcos
+ *
+ */
 public class TweetAuthFrame extends JFrame {
 
 	private static final long serialVersionUID = 42L;
 	private Tweet tweet;
 	
+	/**
+	 * Constructor for the JFrame
+	 * @param title
+	 * @throws TwitterException
+	 */
 	public TweetAuthFrame(String title) throws TwitterException {
 		super(title);
 		
@@ -43,7 +50,9 @@ public class TweetAuthFrame extends JFrame {
 				try {
 					Random r = new Random();
 					tweet.auth(pinTextField.getText());
-					tweet.tweet("Testing - " + r.nextInt());
+					String msg = "Testing - " + r.nextInt(); 
+					tweet.tweet(msg);
+					System.out.println(msg);
 				} catch (TwitterException te) {
 					JOptionPane.showMessageDialog(null, "An error occured while trying to authorize" + te, "Error", JOptionPane.ERROR_MESSAGE);
 				}
