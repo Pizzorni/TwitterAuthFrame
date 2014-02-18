@@ -43,7 +43,9 @@ public class TweetAuthFrame extends JFrame {
 				try {
 					Random r = new Random();
 					tweet.auth(pinTextField.getText());
-					tweet.tweet("Testing - " + r.nextInt());
+					String msg = "Testing - " + r.nextInt(); 
+					tweet.tweet(msg);
+					System.out.println(msg);
 				} catch (TwitterException te) {
 					JOptionPane.showMessageDialog(null, "An error occured while trying to authorize" + te, "Error", JOptionPane.ERROR_MESSAGE);
 				}
