@@ -14,8 +14,8 @@ import twitter4j.TwitterException;
 
 /**
  * JFrame for the Tweet class
- * @author marcos
- *
+ * 
+ * @author Marcos Mirabent
  */
 public class TweetAuthFrame extends JFrame {
 
@@ -24,6 +24,7 @@ public class TweetAuthFrame extends JFrame {
 	
 	/**
 	 * Constructor for the JFrame
+	 * 
 	 * @param title
 	 * @throws TwitterException
 	 */
@@ -58,13 +59,13 @@ public class TweetAuthFrame extends JFrame {
 				}
 			}
 		});
-		
+
 		c.add(authLabel);
 		c.add(authURLTextField);
 		c.add(pinLabel);
 		c.add(pinTextField);
 		c.add(authButton);
-		
+
 		pack();
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
