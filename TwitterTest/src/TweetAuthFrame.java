@@ -41,6 +41,9 @@ public class TweetAuthFrame extends JFrame {
 		JLabel pinLabel = new JLabel("PIN");
 		final JTextField pinTextField = new JTextField(25);
 		JButton authButton = new JButton("Authenticate");
+		JLabel tweetLabel = new JLabel("Insert text of tweet below, if no text, a default message will be sent");
+		final JTextField tweetTextField = new JTextField("40");
+		JButton tweetButton = new JButton("Tweet");
 		
 		tweet = new Tweet();
 		
@@ -49,13 +52,28 @@ public class TweetAuthFrame extends JFrame {
 		authButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Random r = new Random();
 					tweet.auth(pinTextField.getText());
-					String msg = "Testing - " + r.nextInt(); 
-					tweet.tweet(msg);
-					System.out.println(msg);
 				} catch (TwitterException te) {
-					JOptionPane.showMessageDialog(null, "An error occured while trying to authorize" + te, "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "An error occured while trying to authorize\n" + te, "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		
+		tweetButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String msg;
+				String textField = tweetTextField.getText();
+				try {
+					if(textField == "" || tweetTextField.getText() == null) {
+						Random r = new Random();
+						msg = "Testing - " + r.nextInt();
+					} else {
+						msg = textField;
+					}
+					System.out.println(msg);
+					tweet.tweet(msg);
+				} catch (TwitterException te) {
+					JOptionPane.showMessageDialog(null, "An error occured while trying to tweet\n" + te, "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -65,6 +83,9 @@ public class TweetAuthFrame extends JFrame {
 		c.add(pinLabel);
 		c.add(pinTextField);
 		c.add(authButton);
+		c.add(tweetLabel);
+		c.add(tweetTextField);
+		c.add(tweetButton);
 
 		pack();
 		setVisible(true);
