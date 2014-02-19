@@ -25,10 +25,16 @@ public class Tweet {
 
 		// Get the request token used to sign API requests
 		requestToken = twitter.getOAuthRequestToken();
-
+		
+		// Persistence object helps to persist the access token after the
+		// program is closed
 		f = new File("access");
 		p = new Persistence(f);
 		
+		// First, try to read the access token, this can fail any number of
+		// ways. If there is no file, IOException, if there is no AccessToken
+		// class for some reason, ClassNotFoundException, etc. If we can find
+		// the old token set it to the Twitter object
 		try {
 			accessToken = p.readAccessToken();
 			twitter.setOAuthAccessToken(accessToken);
@@ -36,7 +42,6 @@ public class Tweet {
 			System.err.println("Could not retrieve access token from file");
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
