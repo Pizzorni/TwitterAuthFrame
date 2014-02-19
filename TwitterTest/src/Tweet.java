@@ -18,8 +18,7 @@ public class Tweet {
 		twitter = TwitterFactory.getSingleton();
 		
 		// App credentials should go in a file, set up the API Key and Secret
-		twitter.setOAuthConsumer("yExf2BzchIyysn62hzMuog",
-								 "hhFzCgJnDCGniK5CuzpxmJZgOMECmvcCjwhjZic");
+		twitter.setOAuthConsumer("yExf2BzchIyysn62hzMuog", "hhFzCgJnDCGniK5CuzpxmJZgOMECmvcCjwhjZic");
 		
 		// Get the request token used to sign API requests
 		requestToken = twitter.getOAuthRequestToken();
@@ -56,7 +55,11 @@ public class Tweet {
 	/**
 	 * Get Authorization URL
 	 * 
+<<<<<<< HEAD
 	 * This returns the authorization URL that the user must navigate to in
+=======
+	 * This returns the authorization URL that the user must nagivate to in
+>>>>>>> 41ef067c3d09e99820066fb03579c847cbad3a83
 	 * order to get the PIN to complete the authorization dance
 	 * @return Authorization URL
 	 */
