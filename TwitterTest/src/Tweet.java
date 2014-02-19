@@ -55,11 +55,7 @@ public class Tweet {
 	/**
 	 * Get Authorization URL
 	 * 
-<<<<<<< HEAD
 	 * This returns the authorization URL that the user must navigate to in
-=======
-	 * This returns the authorization URL that the user must nagivate to in
->>>>>>> 41ef067c3d09e99820066fb03579c847cbad3a83
 	 * order to get the PIN to complete the authorization dance
 	 * @return Authorization URL
 	 */
