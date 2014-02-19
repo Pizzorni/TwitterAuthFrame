@@ -17,9 +17,6 @@ public class Tweet {
 		// The factory instance is re-useable and thread safe.
 		twitter = TwitterFactory.getSingleton();
 		
-		// App credentials should go in a file, set up the API Key and Secret
-		twitter.setOAuthConsumer("yExf2BzchIyysn62hzMuog", "hhFzCgJnDCGniK5CuzpxmJZgOMECmvcCjwhjZic");
-		
 		// Get the request token used to sign API requests
 		requestToken = twitter.getOAuthRequestToken();
 
