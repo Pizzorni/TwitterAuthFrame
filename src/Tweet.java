@@ -7,7 +7,7 @@ import twitter4j.auth.*;
 
 public class Tweet {
 
-	Twitter twitter;
+	AsyncTwitter twitter;
 	RequestToken requestToken;
 	AccessToken accessToken;
 	Persistence p;
@@ -20,8 +20,7 @@ public class Tweet {
 	 */
 	public Tweet() throws TwitterException{
 		// Create the twitter instance
-		// The factory instance is re-useable and thread safe.
-		twitter = TwitterFactory.getSingleton();
+		twitter = (new AsyncTwitterFactory()).getInstance();
 
 		// Get the request token used to sign API requests
 		requestToken = twitter.getOAuthRequestToken();
