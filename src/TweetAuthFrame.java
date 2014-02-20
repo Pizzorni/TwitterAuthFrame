@@ -7,7 +7,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import java.io.File;
@@ -25,13 +24,13 @@ import twitter4j.TwitterException;
 public class TweetAuthFrame extends JFrame {
 
 	private static final long serialVersionUID = 42L;
-	
+
 	private AsyncTwitter twitter;
-	private RequestToken requestToken;
+//	private RequestToken requestToken;
 	private AccessToken accessToken;
 	private Persistence p;
 	private File f;
-	
+
 	/**
 	 * Constructor for the JFrame
 	 * 
@@ -41,52 +40,118 @@ public class TweetAuthFrame extends JFrame {
 	public TweetAuthFrame(String title) throws TwitterException {
 		super(title);
 		
+		/*
+		 * Act I
+		 */
+		
+		// Containment
 		Container c = this.getContentPane();
 		c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
-		
+
+
+		// UI Elements
 		JLabel authLabel = new JLabel("Please paste the following URL into a "
-			+ "web browser to authorize the app to use your twitter account. "
-			+ "Then paste the PIN provided below");
-		JTextField authURLTextField = new JTextField(25);
+				+ "web browser to authorize the app to use your twitter account. "
+				+ "Then paste the PIN provided below");
+		final JTextField authURLTextField = new JTextField(25);
 		JLabel pinLabel = new JLabel("PIN");
 		final JTextField pinTextField = new JTextField(25);
 		JButton authButton = new JButton("Authenticate");
 		JLabel tweetLabel = new JLabel("Insert text of tweet below, if no text, a default message will be sent");
 		final JTextField tweetTextField = new JTextField("40");
-		JButton tweetButton = new JButton("Tweet");
+		final JButton tweetButton = new JButton("Tweet");
+		tweetButton.setEnabled(false);
+		
+		/*
+		 * Act II
+		 */
+		
+		//Twitter setup
+		AsyncTwitterFactory aTwitterFactory = new AsyncTwitterFactory();
+		
+		// Persistence object helps to persist the access token after the
+		// program is closed
+		f = new File("access");
+		p = new Persistence(f);
+
+		// Try to read the access token from the file
+		try {
+			// If you find the token, set up the twitter instance
+			accessToken = p.readAccessToken();
+			twitter = aTwitterFactory.getInstance(accessToken);
+			
+		} catch (IOException e) {
+			System.err.println("Could not retrieve access token from file");
+		} catch (ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		} finally {
+			// if not, set up a blank twitter instance
+			twitter = aTwitterFactory.getInstance();
+		}
 		
 		
-		authURLTextField.setText(requestToken.getAuthorizationURL());
-		
-		authButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		// Add callback methods for the asynchronous twitter
+		twitter.addListener(new TwitterAdapter() {
+			public void updatedStatus(Status s) {
+				System.out.println("Updated status - " + s.getText());
+			}
+
+			public void gotOAuthAccessToken(AccessToken token) {
 				try {
-					auth(pinTextField.getText());
-				} catch (TwitterException te) {
-					JOptionPane.showMessageDialog(null, "An error occured while trying to authorize\n" + te, "Error", JOptionPane.ERROR_MESSAGE);
+					p.writeAccessToken(token);
+					tweetButton.setEnabled(true);
+					System.out.println("Got access token");
+				} catch (IOException e) {
+					System.err.println("Couldn't persist the access token");
+					e.printStackTrace();
 				}
+			}
+			
+			public void gotOAuthRequestToken(RequestToken token) {
+				System.out.println("Got request token");
+				authURLTextField.setText(token.getAuthorizationURL());
+//				requestToken = token;
 			}
 		});
 		
-		tweetButton.addActionListener(new ActionListener() {
+		twitter.getOAuthRequestTokenAsync();
+		
+		
+		/*
+		 * Act III
+		 */
+		
+		// Listeners
+		authButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String msg;
-				String textField = tweetTextField.getText();
-				try {
-					if(textField == "" || tweetTextField.getText() == null) {
-						Random r = new Random();
-						msg = "Testing - " + r.nextInt();
-					} else {
-						msg = textField;
-					}
-					System.out.println(msg);
-					twitter.updateStatus(msg);
-				} catch (TwitterException te) {
-					JOptionPane.showMessageDialog(null, "An error occured while trying to tweet\n" + te, "Error", JOptionPane.ERROR_MESSAGE);
+				String pin = pinTextField.getText();
+				if(pin.length() > 0){
+					twitter.getOAuthAccessTokenAsync(pin);
+				}else{
+					twitter.getOAuthAccessTokenAsync();
 				}
 			}
 		});
 
+		tweetButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String msg;
+				String textField = tweetTextField.getText();
+				if(textField == "" || textField == null) {
+					Random r = new Random();
+					msg = "Testing - " + r.nextInt();
+				} else {
+					msg = textField;
+				}
+				twitter.updateStatus(msg);
+			}
+		});
+		
+		/*
+		 * Act IV
+		 */
+
+		// Adding UI Elements
 		c.add(authLabel);
 		c.add(authURLTextField);
 		c.add(pinLabel);
@@ -95,54 +160,15 @@ public class TweetAuthFrame extends JFrame {
 		c.add(tweetLabel);
 		c.add(tweetTextField);
 		c.add(tweetButton);
+		
+		/*
+		 * Act V
+		 */
 
+		// Frame setup and visibility
 		pack();
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-	}
-	
-	protected void setUpTwitter() throws TwitterException {
-		// Create the twitter instance
-		twitter = (new AsyncTwitterFactory()).getInstance();
-
-		// Get the request token used to sign API requests
-		requestToken = twitter.getOAuthRequestToken();
-
-		// Persistence object helps to persist the access token after the
-		// program is closed
-		f = new File("access");
-		p = new Persistence(f);
-
-		// First, try to read the access token, this can fail any number of
-		// ways. If there is no file, IOException, if there is no AccessToken
-		// class for some reason, ClassNotFoundException, etc. If we can find
-		// the old token set it to the Twitter object
-		try {
-			accessToken = p.readAccessToken();
-			twitter.setOAuthAccessToken(accessToken);
-		} catch (Exception e) {
-			System.err.println("Could not retrieve access token from file");
-			e.printStackTrace();
-		}
-	}
-	
-	protected void auth(String pin) throws TwitterException {
-		if(pin.length() > 0){
-			accessToken = twitter.getOAuthAccessToken(requestToken, pin);
-		}else{
-			accessToken = twitter.getOAuthAccessToken();
-		}
-		try {
-			p.writeAccessToken(accessToken);
-		} catch(IOException ioe) {
-			System.err.println("Something shitty happened - could not persist the "
-					+ "twitter access token");
-			ioe.printStackTrace();
-		}
-	}
-	
-	public Tweet getTweetObject() {
-		return tweet;
 	}
 }
 
