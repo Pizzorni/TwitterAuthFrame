@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-//import java.io.File;
+import java.io.File;
 //import java.io.IOException;
 
 import twitter4j.*;
@@ -26,9 +26,8 @@ public class TweetAuthFrame extends JFrame {
 	private static final long serialVersionUID = 42L;
 
 	private AsyncTwitter twitter;
-//	private AccessToken accessToken;
-//	private Persistence p;
-//	private File f;
+	private AccessToken accessToken;
+	private Persistence p;
 	JLabel authLabel;
 	JLabel pinLabel;
 	JLabel tweetLabel;
@@ -85,23 +84,22 @@ public class TweetAuthFrame extends JFrame {
 
 		// Persistence object helps to persist the access token after the
 		// program is closed
-//		f = new File("access");
-//		p = new Persistence(f);
+		p = new Persistence(new File("access"));
 
 		twitter = aTwitterFactory.getInstance();
 
-//		// Try to read the access token from the file
-//		try {
-//			// If you find the token, set up the twitter instance
-//			accessToken = p.readAccessToken();
-//			twitter.setOAuthAccessToken(accessToken);
-//		} catch (IOException e) {
-//			// Error reading from file probably
-//			System.err.println("Could not retrieve access token from file");
-//		} catch (ClassNotFoundException cnfe) {
-//			// Error casting, twitter4j not loaded probably
-//			cnfe.printStackTrace();
-//		}
+		//		// Try to read the access token from the file
+		//		try {
+		//			// If you find the token, set up the twitter instance
+		//			accessToken = p.readAccessToken();
+		//			twitter.setOAuthAccessToken(accessToken);
+		//		} catch (IOException e) {
+		//			// Error reading from file probably
+		//			System.err.println("Could not retrieve access token from file");
+		//		} catch (ClassNotFoundException cnfe) {
+		//			// Error casting, twitter4j not loaded probably
+		//			cnfe.printStackTrace();
+		//		}
 
 		// Add callback methods for the asynchronous twitter
 		twitter.addListener(new TwitterAdapter() {
@@ -110,21 +108,32 @@ public class TweetAuthFrame extends JFrame {
 			}
 
 			public void gotOAuthAccessToken(AccessToken token) {
-//				try {
-//					p.writeAccessToken(token);
-					tweetButton.setEnabled(true);
-					System.out.println("Got access token");
-//				} catch (IOException e) {
-//					System.err.println("Couldn't persist the access token");
-//					e.printStackTrace();
-//				}
+				//				try {
+				//					p.writeAccessToken(token);
+				tweetButton.setEnabled(true);
+				System.out.println("Got access token");
+				//				} catch (IOException e) {
+				//					System.err.println("Couldn't persist the access token");
+				//					e.printStackTrace();
+				//				}
 			}
 
 			public void gotOAuthRequestToken(RequestToken token) {
 				System.out.println("Got request token");
-				authURLTextField.setText(token.getAuthorizationURL());
-				System.out.println("found it");
-				authButton.setEnabled(true);
+				try {
+					accessToken = p.readAccessToken();
+				} catch (Exception e) {
+					System.err.println("Exception ocurred when trying to read"
+							+ "access token from file");
+					accessToken = null;
+				}
+				if(accessToken != null) {
+					twitter.setOAuthAccessToken(accessToken);
+					tweetButton.setEnabled(true);
+				} else {
+					authURLTextField.setText(token.getAuthorizationURL());
+					authButton.setEnabled(true);
+				}
 			}
 		});
 
