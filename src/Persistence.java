@@ -40,9 +40,10 @@ public class Persistence {
 	/**
 	 * Opens the file f for reading, reads the AccessToken object from the file and closes the file
 	 * @return the users access token
+	 * @throws ClassNotFoundException 
 	 * @throws Exception
 	 */
-	public AccessToken readAccessToken() throws Exception {
+	public AccessToken readAccessToken() throws IOException, ClassNotFoundException {
 		ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
 		AccessToken at = (AccessToken)ois.readObject();
 		ois.close();
