@@ -12,7 +12,7 @@ import twitter4j.auth.AccessToken;
 
 /**
  * Persist Access Tokens
- * @author marcos
+ * @author Marcos
  *
  */
 public class Persistence {

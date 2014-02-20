@@ -91,5 +91,9 @@ public class TweetAuthFrame extends JFrame {
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
+	
+	public Tweet getTweetObject() {
+		return tweet;
+	}
 }
 
